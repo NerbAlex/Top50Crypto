@@ -6,10 +6,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.inc.simplecoinmarketcap.MyApp
 import ru.inc.simplecoinmarketcap.databinding.ItemCryptoBinding
-import ru.inc.simplecoinmarketcap.extensions.glide
 import ru.inc.simplecoinmarketcap.model.entities.ui.Crypto
 
 class MainAdapter : RecyclerView.Adapter<MainAdapter.MyViewHolder>() {
+
+    companion object {
+        const val BASE_URL = "https://www.cryptocompare.com"
+    }
+
 
     var list: List<Crypto> = mutableListOf()
         set(value) {
@@ -33,19 +37,14 @@ class MainAdapter : RecyclerView.Adapter<MainAdapter.MyViewHolder>() {
 
     class MyViewHolder(val ui: ItemCryptoBinding) : RecyclerView.ViewHolder(ui.root) {
 
-        val base_url = "https://www.cryptocompare.com"
-
         fun bind(crypto: Crypto) {
-//            ui.iconCrypto.glide(crypto.imgUrl, ui.iconCrypto)
             ui.nameCrypto.text = crypto.name
             ui.nameCryptoFull.text = crypto.fullName
             ui.nameCryptoPrice.text = crypto.price
             ui.nameCryptoDayChange.text = crypto.changeDay
 
             Glide.with(MyApp.instance.applicationContext)
-//                .asBitmap()
-//                .centerCrop()
-                .load("$base_url${crypto.imgUrl}")
+                .load("$BASE_URL${crypto.imgUrl}")
                 .into(ui.iconCrypto)
         }
     }
