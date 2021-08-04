@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/icon_crypto"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="@dimen/margin_side_standard"
+        android:layout_marginTop="@dimen/margin_side_standard"
+        android:layout_marginBottom="@dimen/margin_side_standard"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_launcher_background" />
+
+    <TextView
+        android:id="@+id/name_crypto"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toTopOf="@+id/name_crypto_full"
+        app:layout_constraintStart_toStartOf="@+id/name_crypto_full"
+        tools:text="BTC" />
+
+
+    <TextView
+        android:id="@+id/name_crypto_full"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_side_standard"
+        android:layout_marginBottom="@dimen/margin_side_standard"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/icon_crypto"
+        app:layout_constraintEnd_toStartOf="@+id/name_crypto_day_change"
+        app:layout_constraintStart_toEndOf="@+id/icon_crypto"
+        tools:text="Bitcoin" />
+
+    <TextView
+        android:id="@+id/name_crypto_day_change"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_marginEnd="@dimen/margin_side_standard"
+        app:layout_constraintBottom_toBottomOf="@+id/name_crypto_full"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="изменения: -5.4" />
+
+    <TextView
+        android:id="@+id/name_crypto_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/name_crypto_day_change"
+        app:layout_constraintEnd_toEndOf="@+id/name_crypto_day_change"
+        tools:text="Цена: $ 17,729,4" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Top 50 Crypto</string>
+    <string name="network_request">Check your internet connection</string>
+    <string name="api_request">Server problems, data is out of date</string>
+    <string name="first_start_request">Welcome, please check your internet connection</string>
+</resources>
