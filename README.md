@@ -1,6 +1,10 @@
 # Top50Crypto
 Стек : Kotlin, MVVM, RXJava3, Dagger2, Room, Retrofit, OkhhtpInterceptor.
 
+![one](https://user-images.githubusercontent.com/87127659/128188132-66f6e301-a21e-4cc6-b109-e9a32516e989.png)
+![two](https://user-images.githubusercontent.com/87127659/128188173-b0db9891-992f-4ae8-a120-78788e7c5cfc.png)
+
+
 тестами не покрыто.
 
 # ТЗ:
