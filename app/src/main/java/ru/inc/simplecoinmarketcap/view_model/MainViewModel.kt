@@ -3,12 +3,13 @@ package ru.inc.simplecoinmarketcap.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.PublishSubject
 import ru.inc.simplecoinmarketcap.MyApp
 import ru.inc.simplecoinmarketcap.view_model.response.CryptoRepository
 import ru.inc.simplecoinmarketcap.view_model.response.NetworkStatus
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainViewModel : ViewModel() {
@@ -23,12 +24,17 @@ class MainViewModel : ViewModel() {
     val liveData: LiveData<MainViewState> = mutableLivedata
     private val disposable = CompositeDisposable()
 
+    val searchPublishSubject: PublishSubject<String> = PublishSubject.create()
+
+
     /**
      * проверяем если есть интернет[networkStatus], получаем данные с Api, кешируем в Room и передаем в [liveData],
      * если интернет соединение отсутствует, сообщаем об этом [liveData] и идем за кешем [repository].
      */
     fun startActivity() {
         MyApp.instance.appComponent.inject(this)
+
+        initSearch()
 
         disposable.add(networkStatus.isOnline().subscribe { isOnline ->
             if (isOnline) {
@@ -41,14 +47,21 @@ class MainViewModel : ViewModel() {
     }
 
     /**
-     * Поиск крипты по буквам в полном имени и сокращении
+     * Подписываемся на searchPublishSubject из [MainViewModel.this] и [repository]
+     * Что бы каждый раз не подписываться на новый источник в [repository] и не сбрасывать [disposable] .clear()
+     * перед каждым поиском, используем отдельный publishSubject
      */
-    fun searchCryptoItem(name: String) {
-        disposable.clear() //TODO избавиться от подобного решения (перенести Observable с фильтрами из ui сюда?)
-        disposable.add(repository.search(name).subscribeOn(Schedulers.computation()).subscribe({
-            mutableLivedata.postValue(MainViewState.Success(it))
-        }, {}))
+    private fun initSearch() {
 
+        disposable.add(searchPublishSubject
+            .subscribeOn(Schedulers.computation())
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .subscribe { repository.search(it) })
+
+        disposable.add(repository.searchPublishSubject.subscribe {
+            mutableLivedata.postValue(MainViewState.Success(it))
+        })
     }
 
     /**
