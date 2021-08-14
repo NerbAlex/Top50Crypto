@@ -16,14 +16,12 @@ class MainViewModel : ViewModel() {
 
     @Inject
     lateinit var repository: CryptoRepository
-
     @Inject
     lateinit var networkStatus: NetworkStatus
 
     private val mutableLivedata = MutableLiveData<MainViewState>()
     val liveData: LiveData<MainViewState> = mutableLivedata
     private val disposable = CompositeDisposable()
-
     val searchPublishSubject: PublishSubject<String> = PublishSubject.create()
 
 

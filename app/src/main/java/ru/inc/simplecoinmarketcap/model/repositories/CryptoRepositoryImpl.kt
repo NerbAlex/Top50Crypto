@@ -1,22 +1,16 @@
 package ru.inc.simplecoinmarketcap.model.repositories
 
-import android.util.Log
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
 import ru.inc.simplecoinmarketcap.model.entities.ui.Crypto
 import ru.inc.simplecoinmarketcap.view_model.response.CryptoRepository
 
-class CryptoRepositoryImpl(
-    private val cache: LocalDataSource, private val remoteDataSource: RemoteDataSource
-) :
+class CryptoRepositoryImpl(private val cache: LocalDataSource, private val remoteDataSource: RemoteDataSource) :
     CryptoRepository {
-
-    override val searchPublishSubject: PublishSubject<List<Crypto>> = PublishSubject.create()
-
 
     private var mainList: List<Crypto> = listOf()
     private var searchList: MutableList<Crypto> = mutableListOf()
+    override val searchPublishSubject: PublishSubject<List<Crypto>> = PublishSubject.create()
 
     override fun getNewCryptoList(): Single<List<Crypto>> = remoteDataSource.getTop50Crypto().flatMap {
         mainList = sortHighToLow(it.toMutableList())
@@ -45,7 +39,6 @@ class CryptoRepositoryImpl(
             searchPublishSubject.onNext(searchList)
         }
     }
-
 
     private fun sortHighToLow(list: MutableList<Crypto>): List<Crypto> {
         list.sortByDescending {
