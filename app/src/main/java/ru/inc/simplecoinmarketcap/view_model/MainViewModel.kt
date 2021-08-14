@@ -44,7 +44,7 @@ class MainViewModel : ViewModel() {
      * Поиск крипты по буквам в полном имени и сокращении
      */
     fun searchCryptoItem(name: String) {
-        disposable.clear()
+        disposable.clear() //TODO избавиться от подобного решения (перенести Observable с фильтрами из ui сюда?)
         disposable.add(repository.search(name).subscribeOn(Schedulers.computation()).subscribe({
             mutableLivedata.postValue(MainViewState.Success(it))
         }, {}))
@@ -64,7 +64,7 @@ class MainViewModel : ViewModel() {
     }
 
     /**
-     * Получаем кеш, если отсустсвует сеть и передаем инф. в [liveData]
+     * Получаем кеш если отсустсвует сеть и передаем инф. в [liveData]
      * пустой кеш говорит о том, что это первый запуск приложения и в данный момент нет сети.
      */
     private fun getCache() {
