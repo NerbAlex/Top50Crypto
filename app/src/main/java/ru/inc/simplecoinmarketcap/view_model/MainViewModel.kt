@@ -3,25 +3,27 @@ package ru.inc.simplecoinmarketcap.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.PublishSubject
 import ru.inc.simplecoinmarketcap.MyApp
 import ru.inc.simplecoinmarketcap.view_model.response.CryptoRepository
 import ru.inc.simplecoinmarketcap.view_model.response.NetworkStatus
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainViewModel : ViewModel() {
 
     @Inject
     lateinit var repository: CryptoRepository
-
     @Inject
     lateinit var networkStatus: NetworkStatus
 
     private val mutableLivedata = MutableLiveData<MainViewState>()
     val liveData: LiveData<MainViewState> = mutableLivedata
     private val disposable = CompositeDisposable()
+    val searchPublishSubject: PublishSubject<String> = PublishSubject.create()
+
 
     /**
      * проверяем если есть интернет[networkStatus], получаем данные с Api, кешируем в Room и передаем в [liveData],
@@ -29,6 +31,8 @@ class MainViewModel : ViewModel() {
      */
     fun startActivity() {
         MyApp.instance.appComponent.inject(this)
+
+        initSearch()
 
         disposable.add(networkStatus.isOnline().subscribe { isOnline ->
             if (isOnline) {
@@ -41,14 +45,21 @@ class MainViewModel : ViewModel() {
     }
 
     /**
-     * Поиск крипты по буквам в полном имени и сокращении
+     * Подписываемся на searchPublishSubject из [MainViewModel.this] и [repository]
+     * Что бы каждый раз не подписываться на новый источник в [repository] и не сбрасывать [disposable] .clear()
+     * перед каждым поиском, используем отдельный publishSubject
      */
-    fun searchCryptoItem(name: String) {
-        disposable.clear()
-        disposable.add(repository.search(name).subscribeOn(Schedulers.computation()).subscribe({
-            mutableLivedata.postValue(MainViewState.Success(it))
-        }, {}))
+    private fun initSearch() {
 
+        disposable.add(searchPublishSubject
+            .subscribeOn(Schedulers.computation())
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .subscribe { repository.search(it) })
+
+        disposable.add(repository.searchPublishSubject.subscribe {
+            mutableLivedata.postValue(MainViewState.Success(it))
+        })
     }
 
     /**
@@ -64,7 +75,7 @@ class MainViewModel : ViewModel() {
     }
 
     /**
-     * Получаем кеш, если отсустсвует сеть и передаем инф. в [liveData]
+     * Получаем кеш если отсустсвует сеть и передаем инф. в [liveData]
      * пустой кеш говорит о том, что это первый запуск приложения и в данный момент нет сети.
      */
     private fun getCache() {

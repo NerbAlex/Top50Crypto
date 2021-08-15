@@ -1,15 +1,16 @@
 package ru.inc.simplecoinmarketcap.model.repositories
 
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.subjects.PublishSubject
 import ru.inc.simplecoinmarketcap.model.entities.ui.Crypto
 import ru.inc.simplecoinmarketcap.view_model.response.CryptoRepository
 
 class CryptoRepositoryImpl(private val cache: LocalDataSource, private val remoteDataSource: RemoteDataSource) :
     CryptoRepository {
 
-
     private var mainList: List<Crypto> = listOf()
     private var searchList: MutableList<Crypto> = mutableListOf()
+    override val searchPublishSubject: PublishSubject<List<Crypto>> = PublishSubject.create()
 
     override fun getNewCryptoList(): Single<List<Crypto>> = remoteDataSource.getTop50Crypto().flatMap {
         mainList = sortHighToLow(it.toMutableList())
@@ -25,9 +26,9 @@ class CryptoRepositoryImpl(private val cache: LocalDataSource, private val remot
      * Если строка поиска пуста, присылаем [mainList]
      * Если есть символы, сравниваем и добавляем в [searchList]
      */
-    override fun search(name: String): Single<List<Crypto>> = Single.fromCallable {
+    override fun search(name: String) {
         if (name == "") {
-            mainList
+            searchPublishSubject.onNext(mainList)
         } else {
             searchList.clear()
             mainList.forEach {
@@ -35,7 +36,7 @@ class CryptoRepositoryImpl(private val cache: LocalDataSource, private val remot
                     searchList.add(it)
                 }
             }
-            searchList
+            searchPublishSubject.onNext(searchList)
         }
     }
 

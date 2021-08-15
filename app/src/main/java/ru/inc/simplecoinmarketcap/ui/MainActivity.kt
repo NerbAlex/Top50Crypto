@@ -1,17 +1,14 @@
 package ru.inc.simplecoinmarketcap.ui
 
 import android.os.Bundle
-import android.widget.SearchView
 import android.widget.SearchView.OnQueryTextListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import io.reactivex.rxjava3.core.Observable
 import ru.inc.simplecoinmarketcap.R
 import ru.inc.simplecoinmarketcap.databinding.ActivityMainBinding
 import ru.inc.simplecoinmarketcap.view_model.MainViewModel
 import ru.inc.simplecoinmarketcap.view_model.MainViewState
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -66,20 +63,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initSearchView() {
-        Observable.create<String> { emitter ->
             ui.searchView.setOnQueryTextListener(object : OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    emitter.onNext(query)
+                override fun onQueryTextSubmit(query: String): Boolean {
                     return false
                 }
 
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    emitter.onNext(newText)
+                override fun onQueryTextChange(newText: String): Boolean {
+                    viewModel.searchPublishSubject.onNext(newText)
                     return false
                 }
             })
-        }.debounce(500, TimeUnit.MILLISECONDS)
-            .distinctUntilChanged()
-            .subscribe { viewModel.searchCryptoItem(it) }
-    }
+        }
 }
